@@ -1,35 +1,58 @@
-// const yargs = require('yargs')
-const yargs = require('yargs')
-const { hideBin } = require('yargs/helpers')
-const { addNote, printNotes, removeNoteById } = require('./notes.controller')
+const express = require('express')
+const path = require('path')
+const chalk = require('chalk')
+const { addNote, getNotes, removeNoteById, updateNotes } = require('./notes.controller')
 
-const pkg = require('./package.json')
+const port = 3000
 
-yargs(hideBin(process.argv))
-	.command(
-		'add',
-		'Add new note to list',
-		(yargs) => {
-			yargs.option('title', {
-				type: 'string',
-				describe: 'Note title',
-				demandOption: true
-			})
-		},
-		({ title }) => addNote(title)
-	)
-	.command('list', 'Print all notes', async () => await printNotes())
-	.command(
-		'remove',
-		'Remove note by id',
-		(yargs) => {
-			yargs.option('id', {
-				type: 'string',
-				describe: 'Note id',
-				demandOption: true
-			})
-		},
-		async ({ id }) => await removeNoteById(id)
-	)
-	.version(pkg.version)
-	.parse()
+const app = express()
+
+app.set('view engine', 'ejs')
+app.set('views', 'pages')
+
+app.use(express.static(path.resolve(__dirname, 'public')))
+app.use(
+	express.urlencoded({
+		extended: true
+	})
+)
+app.use(express.json())
+
+app.get('/', async (req, res) => {
+	res.render('index', {
+		title: 'Express app',
+		notes: await getNotes(),
+		created: false
+	})
+})
+
+app.post('/', async (req, res) => {
+	await addNote(req.body.title)
+	res.render('index', {
+		title: 'Express app',
+		notes: await getNotes(),
+		created: true
+	})
+})
+
+app.delete('/:id', async (req, res) => {
+	await removeNoteById(req.params.id)
+	res.render('index', {
+		title: 'Express app',
+		notes: await getNotes(),
+		created: false
+	})
+})
+
+app.put('/', async (req, res) => {
+	await updateNotes(req.body)
+	res.render('index', {
+		title: 'Express app',
+		notes: await getNotes(),
+		created: false
+	})
+})
+
+app.listen(port, () => {
+	console.log(chalk.green('Server has been started on port ' + port))
+})

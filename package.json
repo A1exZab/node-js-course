@@ -3,8 +3,10 @@
 	"version": "1.0.2",
 	"description": "simple NodeJS application",
 	"main": "index.js",
+	"type": "commonjs",
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"start": "node index.js",
+		"serve": "nodemon index.js"
 	},
 	"keywords": [
 		"node",
@@ -14,8 +16,12 @@
 	"license": "ISC",
 	"dependencies": {
 		"chalk": "^4.1.2",
+		"ejs": "^3.1.9",
+		"express": "^4.18.2",
 		"nanoid": "^3.3.6",
 		"yargs": "^17.7.2"
 	},
-	"type": "commonjs"
+	"devDependencies": {
+		"nodemon": "^2.0.22"
+	}
 }
